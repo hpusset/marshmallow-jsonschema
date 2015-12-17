@@ -58,7 +58,7 @@ TYPE_MAP = {
 }
 
 
-def dump_schema(schema_obj):
+def dump_schema(schema_obj, recursive=None):
     json_schema = {
         "type": "object",
         "properties": {},
@@ -70,15 +70,17 @@ def dump_schema(schema_obj):
     mapping[fields.List] = list
     mapping[fields.Url] = str
     mapping[fields.LocalDateTime] = datetime.datetime
+    if not recursive :
+        json_schema['title'] = schema_obj.__class__.__name__
     for field_name, field in schema_obj.fields.items():
         if isinstance(field, fields.Nested):
             if field.many:
-                sub_json_schema = dump_schema(field.schema)
+                sub_json_schema = dump_schema(field.schema, recursive=True)
                 json_schema['properties'][field_name] = {}
                 json_schema['properties'][field_name]['type'] = 'array'
                 json_schema['properties'][field_name]['items'] = sub_json_schema
             else:
-                sub_json_schema = dump_schema(field.schema)
+                sub_json_schema = dump_schema(field.schema, recursive=True)
                 json_schema['properties'][field_name] = sub_json_schema
         else:
             python_type = mapping[field.__class__]
@@ -87,7 +89,7 @@ def dump_schema(schema_obj):
             }
             for key, val in TYPE_MAP[python_type].items():
                 json_schema['properties'][field.name][key] = val
-                
+        
         if field.default is not missing:
             json_schema['properties'][field.name]['default'] = field.default
         if field.required:
