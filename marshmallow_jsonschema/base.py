@@ -5,7 +5,7 @@ import uuid
 import decimal
 
 from copy import deepcopy
-from marshmallow import fields, missing
+from marshmallow import fields, missing, validate
 
 
 TYPE_MAP = {
@@ -114,6 +114,13 @@ def dump_schema(schema_obj, recursive=None):
             json_schema['properties'][field.name]['default'] = field.default
         if field.required:
             json_schema['required'].append(field.name)
+        if field.validators:
+            for validator in field.validators:
+                if isinstance(validator, validate.OneOf):
+                    json_schema['properties'][field_name]['enum'] = [
+                        (key, value)
+                        for (key, value) 
+                        in zip(validator.choices, (validator.labels or map(str, validator.choices)))]
         if field.metadata and 'metadata' in field.metadata:
             if 'json_schema' in field.metadata['metadata']:
                 json_schema['properties'][field_name] = dict_merge(json_schema['properties'][field_name], 

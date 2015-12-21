@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow_jsonschema import dump_schema
-from marshmallow import Schema, fields, pprint
+from marshmallow import Schema, fields, pprint, validate
 
 Schema.Meta.ordered = False
 
@@ -25,7 +25,17 @@ class Address(Schema):
 
 
 class Person(Schema):
-    firstname = fields.String()
+    NAME_CHOICES = [ 
+        1,
+        2,
+        3,
+    ]
+    LABEL = [
+        'Name1',
+        'Name2',
+        'Name2'
+    ]
+    firstname = fields.String(validate=validate.OneOf(NAME_CHOICES, LABEL))
     lastname = fields.String(metadata={'json_schema': {'title': 'test'}})
     billing_address = fields.Nested(Address)
     delevery_address = fields.Nested(Address)
