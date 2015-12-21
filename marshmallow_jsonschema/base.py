@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import uuid
 import decimal
 
+from copy import deepcopy
 from marshmallow import fields, missing
 
 
@@ -58,6 +61,23 @@ TYPE_MAP = {
 }
 
 
+def to_title(attribute, ignore_list=['uuid', 'id']):
+    title = " ".join([attr for attr in attribute.split('_') if attr not in ignore_list])
+    return title.capitalize()
+
+
+def dict_merge(a, b):
+    if not isinstance(b, dict):
+        return b
+    result = deepcopy(a)
+    for k, v in b.items():
+        if k in result and isinstance(result[k], dict):
+            result[k] = dict_merge(result[k], v)
+        else:
+            result[k] = deepcopy(v)
+    return result
+
+
 def dump_schema(schema_obj, recursive=None):
     json_schema = {
         "type": "object",
@@ -72,7 +92,7 @@ def dump_schema(schema_obj, recursive=None):
     mapping[fields.LocalDateTime] = datetime.datetime
     if not recursive :
         json_schema['title'] = schema_obj.__class__.__name__
-    for field_name, field in schema_obj.fields.items():
+    for position, (field_name, field) in enumerate(schema_obj.fields.items()):
         if isinstance(field, fields.Nested):
             if field.many:
                 sub_json_schema = dump_schema(field.schema, recursive=True)
@@ -84,14 +104,17 @@ def dump_schema(schema_obj, recursive=None):
                 json_schema['properties'][field_name] = sub_json_schema
         else:
             python_type = mapping[field.__class__]
-            json_schema['properties'][field.name] = {
-                'title': field.attribute or field.name,
-            }
+            json_schema['properties'][field.name] = {}         
             for key, val in TYPE_MAP[python_type].items():
                 json_schema['properties'][field.name][key] = val
-        
+        json_schema['properties'][field_name]['propertyOrder'] = position
+        json_schema['properties'][field_name]['title'] = to_title(field_name)
+
         if field.default is not missing:
             json_schema['properties'][field.name]['default'] = field.default
         if field.required:
             json_schema['required'].append(field.name)
+        if field.metadata and 'metadata' in field.metadata:
+            if 'json_schema' in field.metadata['metadata']:
+                json_schema['properties'][field_name] = dict_merge(json_schema['properties'][field_name], field.metadata['metadata']['json_schema'])
     return json_schema
