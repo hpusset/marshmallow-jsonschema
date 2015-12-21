@@ -4,6 +4,8 @@
 from marshmallow_jsonschema import dump_schema
 from marshmallow import Schema, fields, pprint
 
+Schema.Meta.ordered = False
+
 
 class Article(Schema):
     name = fields.String()
@@ -12,8 +14,9 @@ class Article(Schema):
 
 
 class Order(Schema):
+    uuid_order = fields.String()
     price = fields.Int()
-    articles = fields.Nested(Article, many=True, required=True)
+    articles_id = fields.Nested(Article, many=True, required=True)
 
 
 class Address(Schema):
@@ -23,7 +26,7 @@ class Address(Schema):
 
 class Person(Schema):
     firstname = fields.String()
-    lastname = fields.String()
+    lastname = fields.String(metadata={'json_schema': {'title': 'test'}})
     billing_address = fields.Nested(Address)
     delevery_address = fields.Nested(Address)
     other_addresses = fields.Nested(Address, many=True)

@@ -3,83 +3,92 @@ var editor = new JSONEditor(document.getElementById('editor_holder'),{
                 'billing_address': {
                     'properties': {
                         'postal_code': {
-                            'title': 'postal_code',
-                            'type': 'string'
-                        },
+                            'propertyOrder': 1,
+                            'title': 'Postal code',
+                            'type': 'string'},
                         'street': {
-                            'title': 'street',
-                            'type': 'string'}
-                        },
+                            'propertyOrder': 0,
+                            'title': 'Street',
+                            'type': 'string'}},
+                        'propertyOrder': 1,
                         'required': [],
+                        'title': 'Billing address',
                         'type': 'object'},
                 'delevery_address': {
                     'properties': {
                         'postal_code': {
-                            'title': 'postal_code',
-                            'type': 'string'
-                        },
+                            'propertyOrder': 1,
+                            'title': 'Postal code',
+                            'type': 'string'},
                         'street': {
-                            'title': 'street',
-                            'type': 'string'}
-                        },
-                        'required': [],
-                        'type': 'object'},
+                            'propertyOrder': 0,
+                            'title': 'Street',
+                            'type': 'string'}},
+                    'propertyOrder': 3,
+                    'required': [],
+                    'title': 'Delevery address',
+                    'type': 'object'},
                 'firstname': {
-                    'title': 'firstname', 
-                    'type': 'string'
-                },
+                    'propertyOrder': 4,
+                    'title': 'Firstname',
+                    'type': 'string'},
                 'lastname': {
-                    'title': 'lastname', 
-                    'type': 'string'
-                },
+                    'propertyOrder': 0,
+                    'title': 'test',
+                    'type': 'string'},
                 'other_addresses': {
                     'items': {
                         'properties': {
                             'postal_code': {
-                                'title': 'postal_code',
-                                'type': 'string'
-                            },
+                                'propertyOrder': 1,
+                                'title': 'Postal code',
+                                'type': 'string'},
                             'street': {
-                                'title': 'street',
-                                'type': 'string'}
-                            },
-                            'required': [],
-                            'type': 'object'},
-                        'type': 'array'}
-                    },
-            'required': [],
-            'title': 'Person',
-            'type': 'object'},
+                                'propertyOrder': 0,
+                                'title': 'Street',
+                                'type': 'string'}},
+                        'required': [],
+                        'type': 'object'},
+                    'propertyOrder': 2,
+                    'title': 'Other addresses',
+                    'type': 'array'}},
+                'required': [],
+                'title': 'Person',
+                'type': 'object'},
     theme: 'bootstrap2'
 });
 var editor = new JSONEditor(document.getElementById('editor_holder'),{
     schema: {'properties': {
-                'articles': {
+                'articles_id': {
                     'items': {
                         'properties': {
                             'name': {
-                                'title': 'name',
-                                'type': 'string'
-                            },
+                                'propertyOrder': 1,
+                                'title': 'Name',
+                                'type': 'string'},
                             'number': {
-                                'title': 'number',
-                                'type': 'integer'
-                            },
+                                'propertyOrder': 2,
+                                'title': 'Number',
+                                'type': 'integer'},
                             'price': {
-                                'title': 'price',
-                                'type': 'integer'
-                            }
-                        },
-                        'required': [],
-                        'type': 'object'},
-                    'type': 'array'},
+                                'propertyOrder': 0,
+                                'title': 'Price',
+                                'type': 'integer'}},
+                            'required': [],
+                            'type': 'object'},
+                            'propertyOrder': 0,
+                            'title': 'Articles',
+                            'type': 'array'},
                 'price': {
-                    'title': 'price', 
-                    'type': 'integer'}
-                },
-            'required': ['articles'],
-            'title': 'Order',
-            'type': 'object'
-        },
+                    'propertyOrder': 1,
+                    'title': 'Price',
+                    'type': 'integer'},
+                'uuid_order': {
+                    'propertyOrder': 2,
+                    'title': 'Order',
+                    'type': 'string'}},
+                'required': ['articles_id'],
+                'title': 'Order',
+                'type': 'object'},
     theme: 'bootstrap2'
 });
