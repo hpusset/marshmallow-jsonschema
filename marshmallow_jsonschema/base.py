@@ -116,5 +116,6 @@ def dump_schema(schema_obj, recursive=None):
             json_schema['required'].append(field.name)
         if field.metadata and 'metadata' in field.metadata:
             if 'json_schema' in field.metadata['metadata']:
-                json_schema['properties'][field_name] = dict_merge(json_schema['properties'][field_name], field.metadata['metadata']['json_schema'])
+                json_schema['properties'][field_name] = dict_merge(json_schema['properties'][field_name], 
+                                                                   field.metadata['metadata']['json_schema'])
     return json_schema
