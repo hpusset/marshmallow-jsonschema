@@ -62,11 +62,15 @@ TYPE_MAP = {
 
 
 def to_title(attribute, ignore_list=['uuid', 'id']):
+    """ `to_title` converts and attribute name into a humanized title.
+    """
     title = " ".join([attr for attr in attribute.split('_') if attr not in ignore_list])
     return title.capitalize()
 
 
 def dict_merge(a, b):
+    """ `dict_merge` deep merges b into a and returns the new dict.
+    """
     if not isinstance(b, dict):
         return b
     result = deepcopy(a)
@@ -104,13 +108,15 @@ def _dump_field(field):
     return field_props
 
 
-def dump_schema(schema_obj, title=None):
+def dump_schema(schema, title=None):
+    """ dump_schema dumps schema a `marshmallow.Schema` instance into a json_schema dictionary.
+    """
     json_schema = {
         "type": "object",
         "properties": {},
         "required": [],
     }
-    mapping = {v: k for k, v in schema_obj.TYPE_MAPPING.items()}
+    mapping = {v: k for k, v in schema.TYPE_MAPPING.items()}
     mapping[fields.Email] = str
     mapping[fields.Dict] = dict
     mapping[fields.List] = list
@@ -122,7 +128,7 @@ def dump_schema(schema_obj, title=None):
 
     if title is not None:
         json_schema['title'] = title
-    for position, (field_name, field) in enumerate(schema_obj.fields.items()):
+    for position, (field_name, field) in enumerate(schema.fields.items()):
         json_schema['properties'][field.name] = field_props = {}
         if isinstance(field, fields.List):
             field_props['type'] = 'array'
