@@ -132,7 +132,8 @@ def dump_schema(schema, title=None):
         json_schema['properties'][field.name] = field_props = {}
         if isinstance(field, fields.List):
             field_props['type'] = 'array'
-            field_props['items'] = _dump_field(field.container).update(_tm(field.container))
+            field_props['items'] = items = _dump_field(field.container)
+            items.update(_tm(field.container))
         if isinstance(field, fields.Nested):
             if field.many:
                 sub_json_schema = dump_schema(field.schema)
