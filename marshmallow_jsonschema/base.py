@@ -68,15 +68,15 @@ def to_title(attribute, ignore_list=['uuid', 'id']):
     return title.capitalize()
 
 
-def dict_merge(a, b):
-    """ `dict_merge` deep merges b into a and returns the new dict.
+def _dict_merge(a, b):
+    """ `_dict_merge` deep merges b into a and returns the new dict.
     """
     if not isinstance(b, dict):
         return b
     result = deepcopy(a)
     for k, v in b.items():
         if k in result and isinstance(result[k], dict):
-            result[k] = dict_merge(result[k], v)
+            result[k] = _dict_merge(result[k], v)
         else:
             result[k] = deepcopy(v)
     return result
@@ -103,7 +103,7 @@ def _dump_field(field):
                     field_props['options']['enum_titles'] = validator.labels
     if field.metadata and 'metadata' in field.metadata:
         if 'json_schema' in field.metadata['metadata']:
-            field_props = dict_merge(field_props, field.metadata['metadata']['json_schema'])
+            field_props = _dict_merge(field_props, field.metadata['metadata']['json_schema'])
 
     return field_props
 
