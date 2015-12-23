@@ -117,14 +117,16 @@ def dump_schema(schema_obj, title=None):
     mapping[fields.Url] = str
     mapping[fields.LocalDateTime] = datetime.datetime
 
+    def _tm(f):  # type mapping lookup
+        return TYPE_MAP[mapping[f.__class__]]
+
     if title is not None:
         json_schema['title'] = title
     for position, (field_name, field) in enumerate(schema_obj.fields.items()):
         json_schema['properties'][field.name] = field_props = {}
         if isinstance(field, fields.List):
             field_props['type'] = 'array'
-            field_props['items'] = _dump_field(field.container)
-            field_props['items'].update(TYPE_MAP[mapping[field.container.__class__]])
+            field_props['items'] = _dump_field(field.container).update(_tm(field.container))
         if isinstance(field, fields.Nested):
             if field.many:
                 sub_json_schema = dump_schema(field.schema)
@@ -134,7 +136,7 @@ def dump_schema(schema_obj, title=None):
                 sub_json_schema = dump_schema(field.schema)
                 field_props.update(sub_json_schema)
         else:
-            field_props.update(TYPE_MAP[mapping[field.__class__]])
+            field_props.update(_tm(field))
 
         if field.required:
             json_schema['required'].append(field.name)
