@@ -90,39 +90,44 @@ def dump_schema(schema_obj, recursive=None):
     mapping[fields.List] = list
     mapping[fields.Url] = str
     mapping[fields.LocalDateTime] = datetime.datetime
-    if not recursive :
+
+    if not recursive:
         json_schema['title'] = schema_obj.__class__.__name__
     for position, (field_name, field) in enumerate(schema_obj.fields.items()):
+        json_schema['properties'][field.name] = field_props = {}
         if isinstance(field, fields.Nested):
             if field.many:
                 sub_json_schema = dump_schema(field.schema, recursive=True)
-                json_schema['properties'][field_name] = {}
-                json_schema['properties'][field_name]['type'] = 'array'
-                json_schema['properties'][field_name]['items'] = sub_json_schema
+                field_props['type'] = 'array'
+                field_props['items'] = sub_json_schema
             else:
                 sub_json_schema = dump_schema(field.schema, recursive=True)
-                json_schema['properties'][field_name] = sub_json_schema
+                field_props.update(sub_json_schema)
         else:
             python_type = mapping[field.__class__]
-            json_schema['properties'][field.name] = {}         
             for key, val in TYPE_MAP[python_type].items():
-                json_schema['properties'][field.name][key] = val
-        json_schema['properties'][field_name]['propertyOrder'] = position
-        json_schema['properties'][field_name]['title'] = to_title(field_name)
+                field_props[key] = val
+        field_props['propertyOrder'] = position
+        field_props['title'] = to_title(field_name)
 
         if field.default is not missing:
-            json_schema['properties'][field.name]['default'] = field.default
+            field_props['default'] = field.default
         if field.required:
             json_schema['required'].append(field.name)
         if field.validators:
             for validator in field.validators:
+                if isinstance(validator, validate.Length):
+                    if validator.min is not None:
+                        field_props['minLength'] = validator.min
+                    if validator.max is not None:
+                        field_props['maxLength'] = validator.max
                 if isinstance(validator, validate.OneOf):
-                    json_schema['properties'][field_name]['enum'] = [
-                        (key, value)
-                        for (key, value) 
-                        in zip(validator.choices, (validator.labels or map(str, validator.choices)))]
+                    field_props['enum'] = validator.choices
+                    if validator.labels:
+                        if 'options' not in field_props:
+                            field_props['options'] = {}
+                        field_props['options']['enum_titles'] = validator.labels
         if field.metadata and 'metadata' in field.metadata:
             if 'json_schema' in field.metadata['metadata']:
-                json_schema['properties'][field_name] = dict_merge(json_schema['properties'][field_name], 
-                                                                   field.metadata['metadata']['json_schema'])
+                field_props = dict_merge(field_props, field.metadata['metadata']['json_schema'])
     return json_schema
