@@ -138,6 +138,7 @@ def dump_schema(schema_obj, title=None):
         else:
             field_props.update(_tm(field))
 
+        field_props['propertyOrder'] = position
         if field.required:
             json_schema['required'].append(field.name)
 
